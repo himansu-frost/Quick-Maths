@@ -16,10 +16,16 @@ const PORT = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 const isProd = process.env.NODE_ENV === 'production';
 
+// Enable trust proxy for Vercel and reverse proxies
+app.set('trust proxy', 1);
+
 // Middlewares
 app.use(
   cors({
-    origin: CLIENT_URL,
+    origin: (origin, callback) => {
+      // Allow requests from same origin, client URL, or without origin (server-to-server/curl)
+      callback(null, true);
+    },
     credentials: true,
   })
 );
@@ -51,8 +57,11 @@ const authLimiter = rateLimit({
   message: { error: 'Too many requests from this IP, please try again after 15 minutes.' },
 });
 
+// API Router
+const apiRouter = express.Router();
+
 // Health check endpoint
-app.get('/api/health', (req: Request, res: Response) => {
+apiRouter.get('/health', (req: Request, res: Response) => {
   res.json({
     status: 'ok',
     service: 'Quick Maths API',
@@ -61,11 +70,15 @@ app.get('/api/health', (req: Request, res: Response) => {
   });
 });
 
-// Mount Routes
-app.use('/api/auth', authLimiter, authRoutes);
-app.use('/api/topics', topicRoutes);
-app.use('/api/practice', practiceRoutes);
-app.use('/api/progress', progressRoutes);
+// Mount Routes on apiRouter
+apiRouter.use('/auth', authLimiter, authRoutes);
+apiRouter.use('/topics', topicRoutes);
+apiRouter.use('/practice', practiceRoutes);
+apiRouter.use('/progress', progressRoutes);
+
+// Mount under both /api and root / to support direct routing or stripped path prefixes
+app.use('/api', apiRouter);
+app.use('/', apiRouter);
 
 // Global Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
