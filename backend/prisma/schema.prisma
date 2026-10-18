@@ -1,0 +1,197 @@
+// Prisma Schema for Quick Maths
+// Database: MySQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  profile          Profile?
+  practiceSessions PracticeSession[]
+  questionAttempts QuestionAttempt[]
+  topicProgress    TopicProgress[]
+  dailyActivities  DailyActivity[]
+
+  @@map("users")
+}
+
+model Profile {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mathSkillGoal    String?
+  dailyGoalMinutes Int      @default(10)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("profiles")
+}
+
+model Topic {
+  id           String    @id // Stable slug, e.g. "shopping-discounts"
+  title        String
+  description  String    @db.Text
+  icon         String    // Lucide icon name, e.g. "Tag", "Wallet"
+  displayOrder Int       @default(0)
+  isPublished  Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  subtopics        Subtopic[]
+  questionTemplates QuestionTemplate[]
+  practiceSessions PracticeSession[]
+  questionAttempts QuestionAttempt[]
+  topicProgress    TopicProgress[]
+
+  @@map("topics")
+}
+
+model Subtopic {
+  id           String    @id // Stable slug, e.g. "single-successive-discounts"
+  topicId      String
+  topic        Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  title        String
+  description  String    @db.Text
+  displayOrder Int       @default(0)
+  isPublished  Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  lessons           Lesson[]
+  questionTemplates QuestionTemplate[]
+  questionAttempts  QuestionAttempt[]
+
+  @@map("subtopics")
+}
+
+model Lesson {
+  id                   String   @id @default(uuid())
+  subtopicId           String
+  subtopic             Subtopic @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+  title                String
+  concept              String   @db.Text
+  formula              String?  @db.Text
+  workedExample        String   @db.Text
+  stepByStepSolution   String   @db.Text
+  mentalShortcut       String?  @db.Text
+  commonMistakes       String?  @db.Text
+  quickCheckQuestion   String?  @db.Text
+  quickCheckOptions    String?  @db.Text // JSON string array
+  quickCheckAnswer     String?
+  displayOrder         Int      @default(0)
+  isPublished          Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@map("lessons")
+}
+
+model QuestionTemplate {
+  id                 String   @id @default(uuid())
+  topicId            String
+  topic              Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  subtopicId         String
+  subtopic           Subtopic @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+  templateKey        String   @unique
+  difficulty         String   // EASY, MEDIUM, HARD
+  templatePattern    String   @db.Text
+  explanationPattern String   @db.Text
+  hintPattern        String   @db.Text
+  unit               String?
+  acceptedRounding   String   @default("2_DECIMALS") // INTEGER, 2_DECIMALS, EXACT
+  isPublished        Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("question_templates")
+}
+
+model PracticeSession {
+  id                 String    @id @default(uuid())
+  userId             String?
+  user               User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestSessionToken  String?
+  topicId            String
+  topic              Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  difficulty         String    // EASY, MEDIUM, HARD
+  totalQuestions     Int       @default(0)
+  correctCount       Int       @default(0)
+  accuracyPercent    Float     @default(0)
+  averageTimeSeconds Float     @default(0)
+  startedAt          DateTime  @default(now())
+  completedAt        DateTime?
+  createdAt          DateTime  @default(now())
+
+  attempts QuestionAttempt[]
+
+  @@index([userId])
+  @@index([guestSessionToken])
+  @@map("practice_sessions")
+}
+
+model QuestionAttempt {
+  id                String          @id @default(uuid())
+  practiceSessionId String
+  practiceSession   PracticeSession @relation(fields: [practiceSessionId], references: [id], onDelete: Cascade)
+  userId            String?
+  user              User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  topicId           String
+  topic             Topic           @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  subtopicId        String?
+  subtopic          Subtopic?       @relation(fields: [subtopicId], references: [id], onDelete: SetNull)
+  questionText      String          @db.Text
+  userAnswer        String
+  correctAnswer     String
+  isCorrect         Boolean
+  elapsedSeconds    Int
+  hintUsed          Boolean         @default(false)
+  explanation       String?         @db.Text
+  createdAt         DateTime        @default(now())
+
+  @@index([userId])
+  @@index([practiceSessionId])
+  @@map("question_attempts")
+}
+
+model TopicProgress {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topicId         String
+  topic           Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  totalAttempts   Int      @default(0)
+  correctAttempts Int      @default(0)
+  accuracyPercent Float    @default(0)
+  lastPracticedAt DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, topicId])
+  @@map("topic_progress")
+}
+
+model DailyActivity {
+  id                 String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activityDate       String   // ISO YYYY-MM-DD
+  questionsCompleted Int      @default(0)
+  minutesSpent       Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([userId, activityDate])
+  @@map("daily_activities")
+}

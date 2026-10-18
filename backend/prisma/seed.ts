@@ -1,0 +1,479 @@
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+export const TOPICS_DATA = [
+  {
+    id: 'budgeting-expense-tracking',
+    title: 'Budgeting & Expense Tracking',
+    description: 'Learn how to manage daily cash flow, allocate savings with the 50/30/20 rule, and plan household expenses without financial stress.',
+    icon: 'Wallet',
+    displayOrder: 1,
+    subtopics: [
+      {
+        id: 'monthly-savings-50-30-20',
+        title: '50/30/20 Budgeting & Monthly Savings',
+        description: 'Divide your net income into 50% Needs, 30% Wants, and 20% Savings/Investments.',
+        displayOrder: 1,
+        lessons: [
+          {
+            title: 'Mastering the 50/30/20 Budget Rule',
+            concept: 'The 50/30/20 rule is an intuitive budgeting framework popularized to balance essentials, lifestyle, and wealth building. After taxes, your take-home income is split into three buckets: 50% for fixed necessities (rent, groceries, bills), 30% for flexible desires (eating out, entertainment, hobbies), and 20% for future security (emergency fund, debt clearance, investing).',
+            formula: 'Needs = Income × 0.50 | Wants = Income × 0.30 | Savings = Income × 0.20',
+            workedExample: 'You earn a monthly net income of ₹45,000. How much should you allocate to Needs, Wants, and Savings according to the 50/30/20 guideline?',
+            stepByStepSolution: 'Step 1: Calculate Needs: ₹45,000 × 0.50 = ₹22,500.\nStep 2: Calculate Wants: ₹45,000 × 0.30 = ₹13,500.\nStep 3: Calculate Savings: ₹45,000 × 0.20 = ₹9,000.\nCheck: ₹22,500 + ₹13,500 + ₹9,000 = ₹45,000.',
+            mentalShortcut: 'To find 20% quickly, find 10% (move decimal point one spot left) and double it! For ₹45,000: 10% is 4,500. Double it to get ₹9,000.',
+            commonMistakes: 'Calculating the percentages on gross salary rather than net take-home salary. Always budget from what actually reaches your account.',
+            quickCheckQuestion: 'If your monthly take-home salary is ₹60,000, what is your recommended 20% savings target?',
+            quickCheckOptions: JSON.stringify(['₹10,000', '₹12,000', '₹15,000', '₹18,000']),
+            quickCheckAnswer: '₹12,000',
+            displayOrder: 1,
+          },
+        ],
+      },
+      {
+        id: 'daily-expense-tracking',
+        title: 'Daily Expense Caps & Discretionary Spends',
+        description: 'Calculate daily allowances from monthly discretionary funds to avoid running out before payday.',
+        displayOrder: 2,
+        lessons: [
+          {
+            title: 'Calculating Your Safe Daily Spending Limit',
+            concept: 'To avoid overspending in the first week of the month, take your flexible discretionary budget (after fixed bills and savings are set aside) and divide it by the number of days in the month.',
+            formula: 'Daily Allowance = (Monthly Income - Fixed Needs - Target Savings) ÷ Days in Month',
+            workedExample: 'After paying rent, groceries, and putting away savings, you have ₹15,000 left for personal spends in a 30-day month. What is your daily spending cap?',
+            stepByStepSolution: 'Step 1: Identify discretionary pool = ₹15,000.\nStep 2: Divide by total days: 15,000 ÷ 30 = ₹500/day.\nIf you spend ₹300 today, you carry forward ₹200 for the weekend!',
+            mentalShortcut: 'Divide by 3, then remove a zero: 15,000 ÷ 3 = 5,000, remove a zero = 500.',
+            commonMistakes: 'Dividing total salary by 30 instead of subtracting non-negotiable bills first.',
+            quickCheckQuestion: 'If you have ₹21,000 discretionary spend for a 30-day month, what is your daily allowance?',
+            quickCheckOptions: JSON.stringify(['₹600', '₹700', '₹750', '₹800']),
+            quickCheckAnswer: '₹700',
+            displayOrder: 1,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'shopping-discounts',
+    title: 'Shopping & Discounts',
+    description: 'Calculate percentage savings instantly, compare bundle deals, handle successive discounts, and understand GST on bills.',
+    icon: 'Percent',
+    displayOrder: 2,
+    subtopics: [
+      {
+        id: 'single-percentage-discounts',
+        title: 'Single Percentage Discounts & Sale Prices',
+        description: 'Quickly compute how much you save and what you actually pay at the cash register.',
+        displayOrder: 1,
+        lessons: [
+          {
+            title: 'Instant Percentage Calculation Shortcuts',
+            concept: 'A discount is a reduction in the original price of an item. Instead of calculating the discount and subtracting it, you can directly find the payable percentage. For instance, a 20% discount means you pay 80% of the price.',
+            formula: 'Final Price = Original Price × (1 - Discount%/100) OR Original Price - (Original Price × Discount%/100)',
+            workedExample: 'A jacket priced at ₹3,200 is on a 25% clearance sale. How much do you pay at checkout?',
+            stepByStepSolution: 'Method A: 25% is 1/4th. ₹3,200 ÷ 4 = ₹800 discount. Final price = ₹3,200 - ₹800 = ₹2,400.\nMethod B: If discount is 25%, you pay 75% (3/4th). (₹3,200 ÷ 4) × 3 = ₹800 × 3 = ₹2,400.',
+            mentalShortcut: 'For 25%: Halve the number, then halve it again! Halve 3,200 → 1,600 → halve again → 800 discount. 3,200 - 800 = 2,400.',
+            commonMistakes: 'Confusing the discount amount (₹800) with the final payable amount (₹2,400). Always check what the question asks for.',
+            quickCheckQuestion: 'A pair of running shoes costs ₹4,000. During a festive sale, a 30% discount is applied. What is the final price?',
+            quickCheckOptions: JSON.stringify(['₹1,200', '₹2,600', '₹2,800', '₹3,000']),
+            quickCheckAnswer: '₹2,800',
+            displayOrder: 1,
+          },
+        ],
+      },
+      {
+        id: 'successive-discounts',
+        title: 'Successive Discounts & "Buy More" Traps',
+        description: 'Understand why "50% + 20% off" is NOT 70% off, and how stacked coupons actually calculate.',
+        displayOrder: 2,
+        lessons: [
+          {
+            title: 'Demystifying Successive Discounts',
+            concept: 'When stores offer successive discounts (e.g., 40% + 20% additional with a store card), the second discount is applied to the already discounted price, NOT the original sticker price.',
+            formula: 'Final Price = Price × (1 - d1/100) × (1 - d2/100) | Net Discount = (d1 + d2 - (d1 × d2)/100)%',
+            workedExample: 'A backpack costs ₹2,000. It has a store discount of 50%, plus an extra 20% coupon at checkout. What is the net price and effective discount?',
+            stepByStepSolution: 'Step 1: First discount of 50% on ₹2,000 = ₹1,000 discount → intermediate price = ₹1,000.\nStep 2: Second discount of 20% on ₹1,000 = ₹200 discount.\nStep 3: Final price = ₹1,000 - ₹200 = ₹800.\nNet total savings: ₹2,000 - ₹800 = ₹1,200 saved out of ₹2,000, which is 60% off (not 70%!).',
+            mentalShortcut: 'Net discount formula: A + B - (A × B)/100. For 50 and 20: 50 + 20 - (50 × 20)/100 = 70 - 10 = 60% total discount.',
+            commonMistakes: 'Adding the two discount percentages directly (50% + 20% = 70%). Retailers rely on shoppers making this exact mental error!',
+            quickCheckQuestion: 'An item is marked at ₹1,000 with successive discounts of 20% and 10%. What is the final price?',
+            quickCheckOptions: JSON.stringify(['₹700', '₹720', '₹740', '₹760']),
+            quickCheckAnswer: '₹720',
+            displayOrder: 1,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'tipping-splitting-bills',
+    title: 'Tipping & Splitting Bills',
+    description: 'Split restaurant checks equally or proportionally, calculate tips and service charges, and divide taxes fairly.',
+    icon: 'UtensilsCrossed',
+    displayOrder: 3,
+    subtopics: [
+      {
+        id: 'equal-bill-splitting-tipping',
+        title: 'Equal Group Splits with Tips & Taxes',
+        description: 'Divide group dining bills smoothly without awkward calculations.',
+        displayOrder: 1,
+        lessons: [
+          {
+            title: 'Fair Group Dining Splits',
+            concept: 'When dining out in a group, calculating each person’s share involves adding the tip/service charge and taxes to the food subtotal, then dividing by the number of diners.',
+            formula: 'Total Bill = Subtotal × (1 + Tip%/100) | Per Person Share = Total Bill ÷ Number of Diners',
+            workedExample: 'A cafe bill subtotal comes to ₹3,600. The group decides to leave a 10% tip. If 4 friends split the total equally, how much does each person pay?',
+            stepByStepSolution: 'Step 1: Calculate 10% tip on ₹3,600 = ₹360.\nStep 2: Total bill = ₹3,600 + ₹360 = ₹3,960.\nStep 3: Divide by 4 people: ₹3,960 ÷ 4 = ₹990 per person.',
+            mentalShortcut: 'Split the subtotal first, then add the tip per person! ₹3,600 ÷ 4 = ₹900. Add 10% of ₹900 (₹90) = ₹990.',
+            commonMistakes: 'Dividing the subtotal by 4 and forgetting to include the tip or service charge in each share.',
+            quickCheckQuestion: 'A dinner bill is ₹2,400. With a 15% tip added, 3 friends share it equally. What does each pay?',
+            quickCheckOptions: JSON.stringify(['₹880', '₹920', '₹950', '₹960']),
+            quickCheckAnswer: '₹920',
+            displayOrder: 1,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'cooking-recipe-scaling',
+    title: 'Cooking & Recipe Scaling',
+    description: 'Scale recipes up or down for any party size, convert between units, and master kitchen fractions.',
+    icon: 'CookingPot',
+    displayOrder: 4,
+    subtopics: [
+      {
+        id: 'scaling-servings',
+        title: 'Scaling Ingredients for Guest Counts',
+        description: 'Adjust recipe measurements accurately when cooking for more or fewer people.',
+        displayOrder: 1,
+        lessons: [
+          {
+            title: 'The Recipe Scaling Factor Rule',
+            concept: 'Whenever you want to modify a recipe designed for N servings to make M servings, compute the scaling factor (Target Servings ÷ Original Servings). Multiply every ingredient by this exact ratio.',
+            formula: 'Scaling Factor (SF) = Target Servings ÷ Original Servings | Scaled Ingredient = Original Quantity × SF',
+            workedExample: 'A pasta recipe serves 4 people and requires 250 grams of pasta, 120 ml of cream, and 2 garlic cloves. You are hosting a dinner for 10 people. How much pasta and cream do you need?',
+            stepByStepSolution: 'Step 1: Scaling factor = 10 ÷ 4 = 2.5.\nStep 2: Pasta: 250g × 2.5 = 625g.\nStep 3: Cream: 120ml × 2.5 = 300ml.',
+            mentalShortcut: 'To multiply by 2.5: double the number, then add half the original number. For 250: 250 × 2 = 500. Half of 250 = 125. 500 + 125 = 625g!',
+            commonMistakes: 'Scaling cooking time by the same factor as ingredients. Baking 1 cake takes 30 mins; baking 2 cakes side-by-side does not take 60 mins!',
+            quickCheckQuestion: 'A pancake recipe for 3 people requires 150ml of milk. How much milk is needed for 6 people?',
+            quickCheckOptions: JSON.stringify(['225ml', '300ml', '350ml', '450ml']),
+            quickCheckAnswer: '300ml',
+            displayOrder: 1,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'loans-emi-interest',
+    title: 'Loans, EMI & Interest',
+    description: 'Understand simple & compound interest, calculate monthly EMI, and compare no-cost EMI vs upfront cash discounts.',
+    icon: 'Landmark',
+    displayOrder: 5,
+    subtopics: [
+      {
+        id: 'simple-interest-emi',
+        title: 'Simple Interest & Loan Payoffs',
+        description: 'Understand the cost of borrowing money and compute total interest repayments.',
+        displayOrder: 1,
+        lessons: [
+          {
+            title: 'Simple Interest Foundations',
+            concept: 'Simple interest is the cost of borrowing a principal sum P at an annual rate R% for T years. It is determined exclusively on the original loan amount without compounding.',
+            formula: 'SI = (P × R × T) ÷ 100 | Total Repayment = P + SI',
+            workedExample: 'You take a small personal equipment loan of ₹50,000 for 2 years at an annual simple interest rate of 8%. What is the total interest and total repayment?',
+            stepByStepSolution: 'Step 1: Interest per year = 8% of ₹50,000 = ₹4,000.\nStep 2: Total interest for 2 years = ₹4,000 × 2 = ₹8,000.\nStep 3: Total repayment = ₹50,000 + ₹8,000 = ₹58,000.',
+            mentalShortcut: '8% for 2 years = 16% total interest. 10% of 50,000 = 5,000; 5% = 2,500; 1% = 500. 5,000 + 2,500 + 500 = ₹8,000.',
+            commonMistakes: 'Forgetting to convert the loan tenure from months into years when using annual interest rates.',
+            quickCheckQuestion: 'What is the simple interest on a loan of ₹20,000 at 5% per annum for 3 years?',
+            quickCheckOptions: JSON.stringify(['₹1,500', '₹2,000', '₹3,000', '₹3,500']),
+            quickCheckAnswer: '₹3,000',
+            displayOrder: 1,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'travel-commute-estimation',
+    title: 'Travel & Commute Estimation',
+    description: 'Estimate fuel consumption, calculate vehicle mileage in km/L, budget road trips, and split transit expenses.',
+    icon: 'Car',
+    displayOrder: 6,
+    subtopics: [
+      {
+        id: 'fuel-mileage-cost',
+        title: 'Fuel Mileage & Road Trip Budgets',
+        description: 'Plan fuel expenses accurately based on distance and vehicle fuel efficiency.',
+        displayOrder: 1,
+        lessons: [
+          {
+            title: 'Calculating Fuel Needs & Commute Cost',
+            concept: 'To calculate how much fuel a journey requires, divide the trip distance by your vehicle’s mileage (km per litre). Then multiply required litres by the fuel price per litre.',
+            formula: 'Litres Needed = Distance (km) ÷ Mileage (km/L) | Total Fuel Cost = Litres Needed × Price per Litre',
+            workedExample: 'You are planning a 300 km weekend road trip in a car that gives 15 km/L. If petrol costs ₹100/litre, how much will you spend on fuel?',
+            stepByStepSolution: 'Step 1: Litres required = 300 km ÷ 15 km/L = 20 litres.\nStep 2: Fuel cost = 20 litres × ₹100/litre = ₹2,000.',
+            mentalShortcut: 'Divide distance by mileage first: 300 ÷ 15 = 20. Then multiply 20 by 100 = 2,000.',
+            commonMistakes: 'Multiplying distance by mileage instead of dividing. Distance divided by km/L gives litres.',
+            quickCheckQuestion: 'A motorcycle gives 40 km/L. For an 80 km trip with fuel at ₹100/L, what is the fuel cost?',
+            quickCheckOptions: JSON.stringify(['₹150', '₹200', '₹250', '₹300']),
+            quickCheckAnswer: '₹200',
+            displayOrder: 1,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'time-schedule-management',
+    title: 'Time & Schedule Management',
+    description: 'Calculate elapsed time across hours and days, sequence project deadlines, and handle time-zone conversions.',
+    icon: 'Clock',
+    displayOrder: 7,
+    subtopics: [
+      {
+        id: 'elapsed-time-deadlines',
+        title: 'Elapsed Time & Multi-Task Sequencing',
+        description: 'Calculate time spans and end times without making 60-minute base-10 arithmetic errors.',
+        displayOrder: 1,
+        lessons: [
+          {
+            title: 'Base-60 Time Calculations',
+            concept: 'Unlike decimal numbers where 100 cents make a dollar, time is sexagesimal (base 60). 60 minutes make 1 hour. When adding or subtracting time, group minutes into full 60-minute hours.',
+            formula: 'Total Minutes = (Hours × 60) + Minutes | End Time = Start Time + Duration',
+            workedExample: 'A webinar starts at 2:45 PM and lasts 1 hour and 35 minutes. What time does it finish?',
+            stepByStepSolution: 'Step 1: Add 1 hour to 2:45 PM → 3:45 PM.\nStep 2: Add 15 minutes to reach the round hour → 4:00 PM (remaining minutes: 35 - 15 = 20 mins).\nStep 3: Add remaining 20 minutes → 4:20 PM.',
+            mentalShortcut: 'Always jump to the next whole hour first! From 2:45, it is 15 mins to 3:00.',
+            commonMistakes: 'Adding minutes like regular decimals (e.g., thinking 45 + 35 = 80 so it ends at 3.80 PM). Remember 60 mins = 1 hour.',
+            quickCheckQuestion: 'A movie starts at 7:15 PM and runs for 2 hours and 20 minutes. What time does it end?',
+            quickCheckOptions: JSON.stringify(['9:25 PM', '9:35 PM', '9:45 PM', '10:05 PM']),
+            quickCheckAnswer: '9:35 PM',
+            displayOrder: 1,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'fitness-health-calculations',
+    title: 'Fitness & Health Calculations',
+    description: 'Calculate daily protein targets, basal calorie allocations, and training heart-rate zones with transparent mathematics.',
+    icon: 'Activity',
+    displayOrder: 8,
+    subtopics: [
+      {
+        id: 'nutrition-macro-targets',
+        title: 'Nutritional Calorie & Macro Target Math',
+        description: 'Educational arithmetic for daily protein targets and macronutrient energy values.',
+        displayOrder: 1,
+        lessons: [
+          {
+            title: 'Calculating Protein Targets by Bodyweight',
+            concept: 'Active individuals often aim for a daily protein intake proportional to their body mass (typically 1.4g to 2.0g per kg of bodyweight for strength training). Note: This is educational numerical calculation and not medical advice.',
+            formula: 'Daily Protein (grams) = Body Weight (kg) × Target Ratio (g/kg)',
+            workedExample: 'A person weighing 70 kg follows an active fitness regimen targeting 1.6 grams of protein per kilogram of bodyweight. What is their daily target in grams?',
+            stepByStepSolution: 'Step 1: Identify weight = 70 kg.\nStep 2: Multiply by ratio: 70 × 1.6 = 112 grams.',
+            mentalShortcut: 'To multiply by 1.6: 70 × 1 = 70. 70 × 0.6 = 42. 70 + 42 = 112 grams.',
+            commonMistakes: 'Mixing up kilograms and pounds. 1 kg ≈ 2.2 lbs. Always ensure units match.',
+            quickCheckQuestion: 'If an individual weighs 60 kg and targets 1.5g of protein per kg, what is their target?',
+            quickCheckOptions: JSON.stringify(['75g', '80g', '90g', '100g']),
+            quickCheckAnswer: '90g',
+            displayOrder: 1,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'home-repair-interior-work',
+    title: 'Home Repair & Interior Work',
+    description: 'Calculate room wall areas, paint can requirements, floor tile counts with wastage margins, and curtain fabric.',
+    icon: 'Paintbrush',
+    displayOrder: 9,
+    subtopics: [
+      {
+        id: 'wall-area-paint-estimation',
+        title: 'Wall Area & Paint Quantity Estimation',
+        description: 'Determine surface area in square metres or feet and calculate paint litres needed.',
+        displayOrder: 1,
+        lessons: [
+          {
+            title: 'Estimating Paint for a Room',
+            concept: 'To estimate paint needed for a wall or room, calculate the total surface area (Length × Height). Subtract door and window openings, then divide the net area by the paint coverage rate (typically 10-12 sq m per litre per coat). For two coats, double the amount.',
+            formula: 'Wall Area = Length × Height | Litres per coat = Net Area ÷ Coverage Rate',
+            workedExample: 'A feature wall is 5 metres wide and 3 metres high. A 1-litre tin of paint covers 10 sq m. How many litres are required for 2 coats of paint on this wall?',
+            stepByStepSolution: 'Step 1: Wall area = 5m × 3m = 15 sq m.\nStep 2: Litres for 1 coat = 15 ÷ 10 = 1.5 litres.\nStep 3: For 2 coats = 1.5 × 2 = 3 litres.',
+            mentalShortcut: 'Double the area first for 2 coats: 15 sq m × 2 = 30 sq m total coverage. 30 ÷ 10 = 3 litres!',
+            commonMistakes: 'Forgetting that almost all interior painting requires at least 2 coats for an opaque, even finish.',
+            quickCheckQuestion: 'A wall is 4m long and 3m high (12 sq m). Paint covers 12 sq m/litre. How much paint is needed for 2 coats?',
+            quickCheckOptions: JSON.stringify(['1 Litre', '1.5 Litres', '2 Litres', '2.5 Litres']),
+            quickCheckAnswer: '2 Litres',
+            displayOrder: 1,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'salary-tax-planning',
+    title: 'Salary & Tax Planning',
+    description: 'Understand CTC vs take-home salary, calculate Provident Fund & standard deductions, and estimate tax slabs transparently.',
+    icon: 'Receipt',
+    displayOrder: 10,
+    subtopics: [
+      {
+        id: 'ctc-vs-take-home',
+        title: 'CTC Breakdown & Take-Home Salary',
+        description: 'Understand how allowances and statutory deductions convert gross offer letters into real bank deposits.',
+        displayOrder: 1,
+        lessons: [
+          {
+            title: 'Deductions & Net In-Hand Pay',
+            concept: 'Cost to Company (CTC) includes employer contributions, retirement funds, and gross pay. Monthly in-hand pay equals gross monthly salary minus employee provident fund (PF) and applicable tax deductions.',
+            formula: 'Net Monthly Pay = Gross Monthly Pay - Employee PF (12% of Basic) - Professional Tax - Income Tax',
+            workedExample: 'Your gross monthly pay is ₹50,000, with Basic Salary set at 50% (₹25,000). Employee PF deduction is 12% of Basic. Assuming zero tax, what is your monthly in-hand pay?',
+            stepByStepSolution: 'Step 1: Basic salary = ₹25,000.\nStep 2: Employee PF = 12% of ₹25,000 = ₹3,000.\nStep 3: Net monthly in-hand = ₹50,000 - ₹3,000 = ₹47,000.',
+            mentalShortcut: '12% = 10% + 2%. 10% of 25,000 = 2,500. 1% = 250, so 2% = 500. 2,500 + 500 = ₹3,000 deduction.',
+            commonMistakes: 'Calculating PF on the total gross salary rather than on the Basic Salary component.',
+            quickCheckQuestion: 'If Basic salary is ₹30,000, what is the 12% PF deduction?',
+            quickCheckOptions: JSON.stringify(['₹3,000', '₹3,200', '₹3,600', '₹4,000']),
+            quickCheckAnswer: '₹3,600',
+            displayOrder: 1,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ratios-proportions',
+    title: 'Ratios & Proportions',
+    description: 'Simplify ratios, share money or assets proportionally, master direct and inverse variations, and calculate unit prices.',
+    icon: 'Scale',
+    displayOrder: 11,
+    subtopics: [
+      {
+        id: 'sharing-amounts-ratios',
+        title: 'Sharing Amounts in Given Ratios',
+        description: 'Divide money, tasks, or resources fairly according to designated ratios.',
+        displayOrder: 1,
+        lessons: [
+          {
+            title: 'The Total Parts Method for Ratios',
+            concept: 'To divide any quantity into a ratio of A : B, first sum the parts (A + B). Each part is worth (Total Amount ÷ Sum of Parts). Then multiply each person’s share of parts by the value of one part.',
+            formula: 'Value of 1 part = Total ÷ (A + B) | Share A = A × Value of 1 part | Share B = B × Value of 1 part',
+            workedExample: 'Two business partners divide a profit of ₹35,000 in the ratio 3 : 4 based on their capital investments. How much does each partner receive?',
+            stepByStepSolution: 'Step 1: Total parts = 3 + 4 = 7 parts.\nStep 2: Value of 1 part = ₹35,000 ÷ 7 = ₹5,000.\nStep 3: Partner 1 share (3 parts) = 3 × ₹5,000 = ₹15,000.\nStep 4: Partner 2 share (4 parts) = 4 × ₹5,000 = ₹20,000.\nCheck: ₹15,000 + ₹20,000 = ₹35,000.',
+            mentalShortcut: '35 divided by 7 is 5. So 3 × 5 = 15k and 4 × 5 = 20k.',
+            commonMistakes: 'Dividing the total by either 3 or 4 instead of dividing by the sum of parts (3+4=7).',
+            quickCheckQuestion: 'Divide ₹500 in the ratio 2 : 3. What is the smaller share?',
+            quickCheckOptions: JSON.stringify(['₹150', '₹200', '₹250', '₹300']),
+            quickCheckAnswer: '₹200',
+            displayOrder: 1,
+          },
+        ],
+      },
+    ],
+  },
+];
+
+async function main() {
+  console.log('Seeding Quick Maths database with 11 PRD topic categories & lessons...');
+
+  for (const topicData of TOPICS_DATA) {
+    const topic = await prisma.topic.upsert({
+      where: { id: topicData.id },
+      update: {
+        title: topicData.title,
+        description: topicData.description,
+        icon: topicData.icon,
+        displayOrder: topicData.displayOrder,
+      },
+      create: {
+        id: topicData.id,
+        title: topicData.title,
+        description: topicData.description,
+        icon: topicData.icon,
+        displayOrder: topicData.displayOrder,
+        isPublished: true,
+      },
+    });
+
+    for (const subtopicData of topicData.subtopics) {
+      const subtopic = await prisma.subtopic.upsert({
+        where: { id: subtopicData.id },
+        update: {
+          title: subtopicData.title,
+          description: subtopicData.description,
+          displayOrder: subtopicData.displayOrder,
+          topicId: topic.id,
+        },
+        create: {
+          id: subtopicData.id,
+          topicId: topic.id,
+          title: subtopicData.title,
+          description: subtopicData.description,
+          displayOrder: subtopicData.displayOrder,
+          isPublished: true,
+        },
+      });
+
+      for (const lessonData of subtopicData.lessons) {
+        // Find existing lesson by subtopic and title
+        const existingLesson = await prisma.lesson.findFirst({
+          where: {
+            subtopicId: subtopic.id,
+            title: lessonData.title,
+          },
+        });
+
+        if (existingLesson) {
+          await prisma.lesson.update({
+            where: { id: existingLesson.id },
+            data: {
+              concept: lessonData.concept,
+              formula: lessonData.formula,
+              workedExample: lessonData.workedExample,
+              stepByStepSolution: lessonData.stepByStepSolution,
+              mentalShortcut: lessonData.mentalShortcut,
+              commonMistakes: lessonData.commonMistakes,
+              quickCheckQuestion: lessonData.quickCheckQuestion,
+              quickCheckOptions: lessonData.quickCheckOptions,
+              quickCheckAnswer: lessonData.quickCheckAnswer,
+              displayOrder: lessonData.displayOrder,
+            },
+          });
+        } else {
+          await prisma.lesson.create({
+            data: {
+              subtopicId: subtopic.id,
+              title: lessonData.title,
+              concept: lessonData.concept,
+              formula: lessonData.formula,
+              workedExample: lessonData.workedExample,
+              stepByStepSolution: lessonData.stepByStepSolution,
+              mentalShortcut: lessonData.mentalShortcut,
+              commonMistakes: lessonData.commonMistakes,
+              quickCheckQuestion: lessonData.quickCheckQuestion,
+              quickCheckOptions: lessonData.quickCheckOptions,
+              quickCheckAnswer: lessonData.quickCheckAnswer,
+              displayOrder: lessonData.displayOrder,
+              isPublished: true,
+            },
+          });
+        }
+      }
+    }
+  }
+
+  console.log('✅ Successfully seeded all 11 topics, subtopics, and lessons into MySQL database!');
+}
+
+main()
+  .catch((e) => {
+    console.error('Seeding error:', e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
